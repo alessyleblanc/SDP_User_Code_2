@@ -2,13 +2,13 @@ import boto3
 import datetime
 import json
 
-# import RPi.GPIO as GPIO
-# from mfrc522 import SimpleMFRC522
+import RPi.GPIO as GPIO
+from mfrc522 import SimpleMFRC522
 
-# GPIO.setmode(GPIO.BCM)
-# GPIO.setup(18,GPIO.OUT)
-# readerRFID = SimpleMFRC522()
-# GPIO.setwarnings(False)
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(18, GPIO.OUT)
+readerRFID = SimpleMFRC522()
+GPIO.setwarnings(False)
 
 dynamodb_resource = boto3.resource('dynamodb')
 # dynamodb_client = boto3.client('dynamodb')
@@ -17,16 +17,19 @@ table = dynamodb_resource.Table(
 currentItemCount = table.scan('count')['Count']  # 0 at beginning
 endTime = datetime.datetime.now() + datetime.timedelta(0, 20, 0, 0,
                                                        0)  # days, seconds, micro-seconds, milli-seconds, minutes, hours
+UserID = ''
 
 
-# def readFromRFID():
-#     #global userID
-#     global readerRFID
-#     id, text = readerRFID.read()
-#     userID = text.strip()
-#     return userID
+def readFromRFID():
+    # global userID
+    global readerRFID
+    id, text = readerRFID.read()
+    userID = text.strip()
+    return userID
+
 
 def updateItem():
+    global UserID
     table.update_item(
         Key={
             'UserID': UserID
@@ -50,8 +53,9 @@ def deleteItem():
 
 
 def main():
-    while (continueSearching):
-        UserID = '30621276'  # readFromRFID()
+    global UserID
+    while (True):
+        UserID = readFromRFID()
         response = table.get_item(
             Key={
                 'UserID': UserID
@@ -67,15 +71,15 @@ def main():
                     # while(True):
                     #   if(GPIO.input(17) == GPIO.LOW):
                     #       GPIO.output(18,GPIO.LOW)
-                    # GPIO.cleanup()
+                    GPIO.cleanup()
                     updateItem()
-                if (response['Item']['SpotNum'] == '2'):
+                elif (response['Item']['SpotNum'] == '2'):
                     print("SpotNum 2 is available to use now")
                     # GPIO.output(18, GPIO.HIGH)  # Sets pin 17 to HIGH (used for solenoid)
                     # while(True):
                     #   if(GPIO.input(17) == GPIO.LOW):
                     #       GPIO.output(18,GPIO.LOW)
-                    # GPIO.cleanup()
+                    GPIO.cleanup()
                     updateItem()
             elif (response['Item']['IsLocked'] == '1'):
                 if (response['Item']['SpotNum'] == '1'):
@@ -84,18 +88,19 @@ def main():
                     # while(True):
                     #   if(GPIO.input(17) == GPIO.LOW):
                     #       GPIO.output(18,GPIO.LOW)
-                    # GPIO.cleanup()
+                    GPIO.cleanup()
                     deleteItem()
-                if (response['Item']['SpotNum'] == '2'):
+                elif (response['Item']['SpotNum'] == '2'):
                     print("Spot 2 is now unlocked")
                     # GPIO.output(18, GPIO.HIGH)  # Sets pin 17 to HIGH (used for solenoid)
                     # while(True):
                     #   if(GPIO.input(17) == GPIO.LOW):
                     #       GPIO.output(18,GPIO.LOW)
-                    # GPIO.cleanup()
+                    GPIO.cleanup()
                     deleteItem()
         except:
             print("Sorry, wrong UCard or no reservation in place for this UCard at the moment")
+            GPIO.cleanup()
             continue
 
 
