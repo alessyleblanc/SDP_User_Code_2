@@ -71,16 +71,16 @@ def main():
                     # while(True):
                     #   if(GPIO.input(17) == GPIO.LOW):
                     #       GPIO.output(18,GPIO.LOW)
-                    GPIO.cleanup()
                     updateItem()
+                    GPIO.cleanup()
                 elif (response['Item']['SpotNum'] == '2'):
                     print("SpotNum 2 is available to use now")
                     # GPIO.output(18, GPIO.HIGH)  # Sets pin 17 to HIGH (used for solenoid)
                     # while(True):
                     #   if(GPIO.input(17) == GPIO.LOW):
                     #       GPIO.output(18,GPIO.LOW)
-                    GPIO.cleanup()
                     updateItem()
+                    GPIO.cleanup()
             elif (response['Item']['IsLocked'] == '1'):
                 if (response['Item']['SpotNum'] == '1'):
                     print("Spot 1 is now unlocked")
@@ -88,16 +88,16 @@ def main():
                     # while(True):
                     #   if(GPIO.input(17) == GPIO.LOW):
                     #       GPIO.output(18,GPIO.LOW)
-                    GPIO.cleanup()
                     deleteItem()
+                    GPIO.cleanup()
                 elif (response['Item']['SpotNum'] == '2'):
                     print("Spot 2 is now unlocked")
                     # GPIO.output(18, GPIO.HIGH)  # Sets pin 17 to HIGH (used for solenoid)
                     # while(True):
                     #   if(GPIO.input(17) == GPIO.LOW):
                     #       GPIO.output(18,GPIO.LOW)
-                    GPIO.cleanup()
                     deleteItem()
+                    GPIO.cleanup()
         except:
             print("Sorry, wrong UCard or no reservation in place for this UCard at the moment")
             GPIO.cleanup()
